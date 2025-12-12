@@ -2,6 +2,7 @@ import { getPayload } from "payload";
 import configPromise from "@payload-config";
 import { Category } from "@/payload-types";
 
+import { CustomCategory } from "@/types";
 import { Footer, Navbar } from "@/components/common";
 import { SearchFilters } from "@/components/search-filters";
 
@@ -17,6 +18,8 @@ export default async function Layout({ children }: Props) {
   const data = await payload.find({
     collection: "categories",
     depth: 1,
+    pagination: false,
+    sort: "name",
     where: {
       parent: {
         exists: false,
@@ -24,15 +27,13 @@ export default async function Layout({ children }: Props) {
     },
   });
 
-  const formattedData = data.docs.map((doc) => ({
+  const formattedData: CustomCategory[] = data.docs.map((doc) => ({
     ...doc,
     subcategories: (doc.subcategories?.docs ?? []).map((doc) => ({
       ...(doc as Category),
       subcategories: undefined,
     })),
   }));
-
-  console.log(formattedData);
 
   return (
     <div className="flex flex-col min-h-screen">
